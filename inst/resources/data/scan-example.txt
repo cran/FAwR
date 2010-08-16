@@ -1,0 +1,7 @@
+Plot 001  Crew A
+1    DF   23.7
+2    GF   40.1
+Plot 002  Crew A  Clearfell
+Plot 003  Crew B
+1    GF  122.6  
+2    GF   20.3
