@@ -3,8 +3,14 @@
 ## that contains various metrics associated with forest projections.
 ## volumes are computed using the method described simulations.rnw (section
 
+## this file contains functions for
+## the following functions are documented 
+## generate.sims.Rd
+
+
 ## this function returns a data.frame object that represents
 ## the results of combined simulations.
+
 
 generate.sims <- function( s,
                           ch.site=125.0, ch.pnba=1.0,

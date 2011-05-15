@@ -1,5 +1,13 @@
-#	$Id: generate_log_volumes.r 4005 2010-06-19 19:08:00Z hamannj $	
+#	$Id: generate_log_volumes.r 4522 2010-12-19 23:37:25Z hamannj $	
 
+## this script contains two functions:
+## generate.log.vols
+## sp.sums.2
+
+## where the function generate.log.vols returns a dataframe object
+## that contains the original stem measurements and appends columns
+## named log.grades, where log.grades corresponds to the minimum log diameters
+## defined by log.breaks.
 
 ## this script will generate the log volumes
 ## and return a data.frame that contains the
@@ -19,20 +27,12 @@
 generate.log.vols <- function( x,
                               log.breaks=c(2,5,12,18,32,999),
                               log.grades=c("pulp","s4","s3","s2","s1","peeler"),
-##                               log.breaks=c(5,15,30,75,999), ## cm
-##                               log.grades=c("pulp","s3","s2","s1","peeler"),
                               display.stems=FALSE )
 {
   
   if( !is.data.frame( x ) ) {
     stop( "x needs to be a data.frame" )
   }
-
-  ## these are the diameter breaks for the log products
-  ## for pulp, cns, small saw, large saw
-##   ## you can change these to shrink the number of grades...
-##   log.grades <- c("pulp","a","b","c","d","e","z" )
-##   log.bks <- c(10,20,30,45,60,80,999)
 
   ## allocate the grade volumes data frame that will be
   ## cbind'd to the stems data frame (n1 -- for now)
@@ -209,7 +209,6 @@ generate.log.vols <- function( x,
 ## use the existing rconifers function definition.
 ## these grades are a little large and should be scaled down to include pulp 2-5"
 sp.sums.2 <- function( x,
-                      ##log.breaks=c(5,15,30,75,999),
                       log.breaks=c(2,5,12,18,32,999),
                       log.grades=c("pulp","s4","s3","s2","s1","peeler") ) {
 
@@ -245,15 +244,12 @@ sp.sums.2 <- function( x,
     v.p <- v / sum( v )
 
     ## todo: add the total volume 
-    ##total.vol <- sum( x$expf * x$n.stems ) / npts
     total.vol <- sum(v)
     
     sp.sums <- c(qmd,tht,ba,expf,tpa.7.plus,total.vol,v,v.p)
   }
   
-  ##print( "made it here." )
   df <- as.data.frame( t(sapply( x.by.sp, sp.sums.f, nrow(x$plots) )) )
-  ##names( df ) <- c("qmd","tht","ba","expf","expf.7.plus",log.grades)
   names( df ) <- c("qmd","tht","ba","expf","tpa.7.plus","sm.vol",
                    log.grades,paste( rep("p",length(log.grades)), log.grades, sep="." ))
 
