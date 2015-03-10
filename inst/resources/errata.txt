@@ -1,0 +1,48 @@
+Errata for "Forest Analytics with R: An Introduction" by Andrew Robinson and Jeff Hamann, Springer, 2010.
+
+March 17, 2015
+
+*) Kim Iles has commented on the analysis of the VBAR data as documented on p. 113.  The average volume/basal area ratio should be computed at the individual tree level, rather than at the point level.  (An alternative would have been to weight the contributions of the points by their tree count.)  The standard error for the ratio then can be computed for use in the overall standard error equation assuming that the 'in' trees are independent, which is incorrect but probably not terribly so, especially if the subsample is spread equally among the in trees in the count plots, rather than having a strict double sample approach.
+
+The analysis would then look like the following code.
+
+############################
+
+## We assume that the data have been input according to Chapter 2
+
+set.seed(122)
+
+vbar.sample <- sample(1:nrow(pref.point), size = 30)
+vbar.points <- pref.point[vbar.sample,]
+vbar.points <- vbar.points[vbar.points$ba.m2.ha > 0,]
+
+vbar.trees <- subset(pref.tree,
+                     paste(cluster, point) %in%
+		     with(vbar.points, paste(cluster, point)))
+
+vbar.trees$ratio <- with(vbar.trees,
+                         vol.m3 / (pi * dbh.cm^2 / 40000))
+
+(v.hat.vbar <- 
+  mean(pref.point$ba.m2.ha) * mean(vbar.trees$ratio))
+
+s.bar.g.perc.2 <- (sd(pref.point$ba.m2.ha) / 
+                   sqrt(length(pref.point$ba.m2.ha)) / 
+                   mean(pref.point$ba.m2.ha))^2
+s.bar.r.perc.2 <- (sd(vbar.trees$ratio) / 
+                   sqrt(nrow(vbar.trees)) / 
+                   mean(vbar.trees$ratio))^2
+s.bar.v.perc <- sqrt(s.bar.g.perc.2 + s.bar.r.perc.2 -
+                     s.bar.g.perc.2 * s.bar.r.perc.2)
+(s.bar.v <- s.bar.v.perc * v.hat.vbar)
+
+############################
+
+*) The package that formed the basis of Chapter 9, namely glpk, has been retired.  The analysis for the chapter has been rewritten using the glpkAPI package instead, and is included in the package. The script is entitled "from-weikko-jarros-planning_glpkAPI-GenericPaths.R"
+
+*) The documented publisher for Chambers, J. M., Hastie, T. J., 1992. "Statistical Models in S." is incorrect; instead of Chapman and Hall it should be Wadsworth & Brooks/Cole.
+
+
+
+
+
