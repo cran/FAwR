@@ -1,12 +1,10 @@
-# Default NAMESPACE created by R
-# Remove the previous line if you edit this file
+importFrom("graphics", "abline", "plot", "text")
+importFrom("stats", "uniroot")
+importFrom("utils", "tail")
 
-# Export all names
-exportPattern(".")
+import("MASS")
+import("lattice")
+import("glpkAPI")
 
-# Import all packages listed as Imports or Depends
-import(
-  MASS,
-  lattice,
-  glpkAPI
-)
+export("SSallometric","show.cols.with.na","get.row.report","get.col.report",
+       "generate.log.vols","ht.fvs.ni.m","sp.sums.2","vol.fvs.ni.m3")

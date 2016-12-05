@@ -1,4 +1,4 @@
-#	$Id: generate_log_volumes.r 4005 2010-06-19 19:08:00Z hamannj $	
+#	$Id: generate_log_volumes.r 4005 2010-06-19 19:08:00Z hamannj $
 
 
 ## this script will generate the log volumes
@@ -13,7 +13,7 @@
 ## 3     2      IC  2.6718796  0.653022095  6.602279 0.8462617       1 100.00
 
 ## this function is 200 lines long.
-## too long for direct insertion in book page. 
+## too long for direct insertion in book page.
 ## this function will not replace already existing columns
 ## in a data.frame, but will append them
 generate.log.vols <- function( x,
@@ -23,7 +23,7 @@ generate.log.vols <- function( x,
 ##                               log.grades=c("pulp","s3","s2","s1","peeler"),
                               display.stems=FALSE )
 {
-  
+
   if( !is.data.frame( x ) ) {
     stop( "x needs to be a data.frame" )
   }
@@ -51,11 +51,11 @@ generate.log.vols <- function( x,
 
     ##dbh <- dbh / 2.54 ## convert from cm to inches
     ##tht <- tht / 3.2808 ## convert to feet
-    ##hi <- hi / 3.2808 ## convert to feet  
+    ##hi <- hi / 3.2808 ## convert to feet
 
     dbh <- dbh * 2.54 ## convert from inches to cm
     tht <- tht * 0.3048 ## convert to meters
-    hi <- hi * 0.3048 ## convert to meters 
+    hi <- hi * 0.3048 ## convert to meters
 
     ## these numbers should be in what units again?
     ##print( sprintf( "dbh = %f, tht=%f, hi=%f", dbh, tht, hi ) )
@@ -63,58 +63,58 @@ generate.log.vols <- function( x,
     if( hi >= tht ) {
       retval <- 0.0
     } else {
-      p <- 0.25    
+      p <- 0.25
       dib <- 1.02453 * dbh^0.88809 * 1.00035^dbh
       X <- ( 1.0 - sqrt( hi / tht ) ) / ( 1.0 - sqrt( p ) )
       Z = hi / tht
       a = 0.95086 * Z * Z;
       b = -0.18090 * log( Z + 0.001 );
       c = 0.61407 * sqrt( Z ) +  -0.35105 * exp( Z );
-      d = 0.05686 * ( dbh / tht ); 
+      d = 0.05686 * ( dbh / tht );
       retval <- ( dib * X^( a + b + c + d ) )
     }
     retval / 2.54 ## convert from cm to inches
   }
-  
-  
+
+
   ## the md is the merchantable diameter
   merch.height.func <- function( hi, dbh, tht, cr, md ) {
     dib <- bcmof.diDBH( dbh, tht, cr, hi )
     diff <- dib - md
     diff
   }
-  
+
   ## smalian volume
   ## d1, d2, l in meters or feet
   ## return value is in cubic meters or feet
   smal.vol <- function( d1, d2, l ) {
-    ##smal.vol <- pi * l * (d1*d1 + d2*d2 ) / 8.0 
+    ##smal.vol <- pi * l * (d1*d1 + d2*d2 ) / 8.0
     smal.vol <- 0.0054541539 * l * (d1*d1 + d2*d2 ) / 2
     smal.vol
   }
-  
+
   logs <- NULL
 
-  ##print( "starting to buck stem..." )  
-  for( s in 1:nrow(x) ) {  
-    ##print( x[s,] )    
+  ##print( "starting to buck stem..." )
+  for( s in 1:nrow(x) ) {
+    ##print( x[s,] )
     ## if dbh == 0, don't attempt to merch
     if( x[s,]$dbh <= 5.0 ) next
-    
+
     ## for each log.brk
     ## determine if the diameter break is smaller
     ## than the diameter inside bark at the stump
     mh.bks <- rep( 0, length( log.breaks ) )
-    for( i in 1:length(log.breaks) ) {      
+    for( i in 1:length(log.breaks) ) {
 
       ##dbh <- x[s,]$DBH / 10.0
       ##tht <- x[s,]$THT
 
-      ## do not convert. 
-      dbh <- x[s,]$dbh 
+      ## do not convert.
+      dbh <- x[s,]$dbh
       tht <- x[s,]$tht
 
-      if( log.breaks[i] <= bcmof.diDBH( dbh, tht, cr, 0.0 ) ) {    
+      if( log.breaks[i] <= bcmof.diDBH( dbh, tht, cr, 0.0 ) ) {
         mh <- uniroot( merch.height.func,
                       c(0,tht),
                       dbh=dbh,
@@ -127,8 +127,8 @@ generate.log.vols <- function( x,
         mh.bks[i] <- 0.0
       }
     }
-    
-    ##print( mh.bks )  
+
+    ##print( mh.bks )
 
     ## create the final bucked stem
     ## with a stump height as the last entry
@@ -137,31 +137,31 @@ generate.log.vols <- function( x,
     dib <- bcmof.diDBH(dbh,tht,0.60,0.30 ) ## 1/3 feet stump height
     last.grade <- log.grades[nrow(vol.bks.temp)+1]
     last.grade.df <- data.frame(log.grades=last.grade,log.breaks=dib,mh.bks=0.30)
-    
+
     ## prepare the "top" half of the grade data frame
     vol.bks <- rbind( vol.bks.temp, last.grade.df )
-    
+
     ## now append those sorts that are zero
     vol.bks.null <- data.frame( log.grades, log.breaks, mh.bks )
     n.sorts <- nrow( vol.bks )
     diff.rows <- nrow( vol.bks.null ) - nrow( vol.bks )
     vol.bks <- rbind( vol.bks, tail( vol.bks.null, diff.rows ) )
-    
+
     sed <- c(0,vol.bks[1:(n.sorts-1),]$log.breaks,rep(0,diff.rows))
     led <- c(vol.bks[1:n.sorts,]$log.breaks,rep(0,diff.rows))
     vol.bks <- cbind( vol.bks, sed, led )
-    
-    ## compute the smalian volumes for the 
+
+    ## compute the smalian volumes for the
     log.lens <- c( tht - vol.bks[1,]$mh.bks,
                   abs( diff( vol.bks$mh.bks ) )[1:n.sorts-1],
                   rep(0,diff.rows) )
     vol.bks <- cbind( vol.bks, log.lens )
-    
+
     ##len <- abs( c( diff( vol.bks$mh.bks ) ) )
     ##vol.bks$sm.vol <- smal.vol( vol.bks$sed*0.01, vol.bks$led*0.01, vol.bks$log.lens )
     vol.bks$sm.vol <- smal.vol( vol.bks$sed, vol.bks$led, vol.bks$log.lens )
     rownames(vol.bks) <- 1:nrow(vol.bks)
-    
+
 
     if( display.stems ) {
       ##print( "display.stems..." )
@@ -171,35 +171,35 @@ generate.log.vols <- function( x,
       cr <- rep(0.6,length(hi))
       stem.tpr <- data.frame( cbind( dbh, tht, cr, hi ) )
       stem.tpr$dib <- NA
-      for( i in 1:nrow(stem.tpr) ){  
-        stem.tpr[i,]$dib <- bcmof.diDBH( 
-                                        stem.tpr[i,]$dbh, 
-                                        stem.tpr[i,]$tht, 
-                                        stem.tpr[i,]$cr, 
+      for( i in 1:nrow(stem.tpr) ){
+        stem.tpr[i,]$dib <- bcmof.diDBH(
+                                        stem.tpr[i,]$dbh,
+                                        stem.tpr[i,]$tht,
+                                        stem.tpr[i,]$cr,
                                         stem.tpr[i,]$hi )
-        
+
       }
-      
+
       ## plot the stem profile
       plot( stem.tpr$dib ~ stem.tpr$hi, type="l" )
       abline( v=vol.bks$mh.bks, lty=2, lwd=2 )
       abline( h=vol.bks$log.breaks, lty=3 )
-      abline( h=0 ) 
+      abline( h=0 )
       text( x=vol.bks$mh.bks + 1.5,
            y=vol.bks$log.breaks+1,
            labels=paste( vol.bks$log.breaks, "@", round( vol.bks$mh.bks, 2 ) ) )
-    }    
-      
+    }
+
         ## now, assign the volumes for each of the grades (sorts) to the temp data frame
     grade.vols[s,] <- vol.bks$sm.vol
   }
-  
+
   ## add the grade.volumes to the stems (n1 - for now)
   ## you can't use merge because the initial data managers were sloppy
   ##grade.vols$CRUISEID <- n1$CRUISEID
   vol <- rowSums( grade.vols )
   x <- cbind( x, vol, grade.vols )
-  
+
   x
 }
 
@@ -214,18 +214,17 @@ sp.sums.2 <- function( x,
 
   if( class( x ) != "sample.data" ) {
     stop( "Error: x is not a sample.data object." )
-    return
   }
 
   ## this will merchandise the plant list (sample.data$plants)
   ## and return a data.frame that contains a set of metrics
-  x$plants <- generate.log.vols( x$plants, 
-                                     log.breaks, 
+  x$plants <- generate.log.vols( x$plants,
+                                     log.breaks,
                                      log.grades,
                                      display.stems=FALSE )
-  
+
   x.by.sp <- split( x$plants, f=list(x$plants$sp.code ) )
-  
+
   ## this local function computes the summaries each species.
   sp.sums.f <- function( x, npts ) {
     expf <- sum( x$expf * x$n.stems ) / npts
@@ -243,20 +242,20 @@ sp.sums.2 <- function( x,
     v <- t(x) %*% w / npts
     v.p <- v / sum( v )
 
-    ## todo: add the total volume 
+    ## todo: add the total volume
     ##total.vol <- sum( x$expf * x$n.stems ) / npts
     total.vol <- sum(v)
-    
+
     sp.sums <- c(qmd,tht,ba,expf,tpa.7.plus,total.vol,v,v.p)
   }
-  
+
   ##print( "made it here." )
   df <- as.data.frame( t(sapply( x.by.sp, sp.sums.f, nrow(x$plots) )) )
   ##names( df ) <- c("qmd","tht","ba","expf","expf.7.plus",log.grades)
   names( df ) <- c("qmd","tht","ba","expf","tpa.7.plus","sm.vol",
                    log.grades,paste( rep("p",length(log.grades)), log.grades, sep="." ))
 
-  df
+  return(df)
 }
 
 

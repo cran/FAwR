@@ -1,3 +1,9 @@
+2016-11-14  Andrew Robinson  <apro@unimelb.edu.au>
+
+	* Version: 1.1.1
+
+	* generate_log_volumes.r: Deleted erroneous use of return.
+
 2015-03-10  Andrew Robinson  <andrewpr@ms.unimelb.edu.au>
 
 	* Version: 1.1.0
@@ -6,4 +12,4 @@
 
 
 
-	
+

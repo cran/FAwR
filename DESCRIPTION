@@ -1,15 +1,15 @@
 Package: FAwR
 Type: Package
 Title: Functions and Datasets for "Forest Analytics with R"
-Version: 1.1.0
-Date: 2015-03-10
+Version: 1.1.1
+Date: 2016-11-14
 Author: Andrew Robinson and Jeff Hamann
-Maintainer: Andrew Robinson <A.Robinson@ms.unimelb.edu.au>
+Maintainer: Andrew Robinson <apro@unimelb.edu.au>
 Depends: R (>= 2.10), MASS, lattice, glpkAPI
 Description: Provides functions and datasets from the book "Forest Analytics with R".
 License: GPL-3
 LazyLoad: yes
-Packaged: 2015-03-24 00:05:50 UTC; andrewpr
 NeedsCompilation: no
+Packaged: 2016-12-04 21:51:37 UTC; andrewpr
 Repository: CRAN
-Date/Publication: 2015-03-24 07:21:32
+Date/Publication: 2016-12-05 08:27:20
