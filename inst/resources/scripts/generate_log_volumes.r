@@ -1,4 +1,4 @@
-#	$Id: generate_log_volumes.r 4522 2010-12-19 23:37:25Z hamannj $	
+#	$Id$	
 
 ## this script contains two functions:
 ## generate.log.vols

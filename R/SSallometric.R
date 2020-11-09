@@ -17,7 +17,7 @@ structure(function (x, alpha, beta)
     attr(.value, "gradient") <- .grad
     attr(.value, "hessian") <- .hessian
     .value
-}, initial = function (mCall, data, LHS) {
+}, initial = function (mCall, data, LHS, ...) {
   xy <- data.frame(sortedXyData(mCall[["x"]], LHS, data))
   if (nrow(xy) < 3) 
     stop("Too few observations to fit allometric function")

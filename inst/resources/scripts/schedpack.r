@@ -1,4 +1,4 @@
-#	$Id: schedpack.r 4519 2010-12-19 23:32:13Z hamannj $	
+#	$Id$	
 
 ## this is a set of functions to help with the R book
 ## for harvest scheduling.
